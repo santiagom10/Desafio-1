@@ -7,7 +7,6 @@ int alto;
 
 unsigned char* tablero;
 
-// imprimir tablero
 void imprimirTablero() {
 
     for(int i = 0; i < alto; i++) {
@@ -26,7 +25,6 @@ void imprimirTablero() {
     }
 }
 
-// crear tablero
 void crearTablero() {
 
     tablero = new unsigned char[alto];
