@@ -76,18 +76,23 @@ void fijarPieza(uint32* tablero, sint32 alto,
     }
 }
 
+sint32 limpiarFilas(uint32* tablero, sint32 alto, sint32 ancho)
+{
+    uint32 llena = mascaraLlena(ancho);
+    int count = 0;
 
+    for (int i = alto - 1; i >= 0; i--) {
+        if ((tablero[i] & llena) == llena) {
+            for (int k = i; k > 0; k--)
+                tablero[k] = tablero[k - 1];
 
-
-
-//// linmpiar filas
-
-
-
-
-
-
-
+            tablero[0] = 0;
+            count++;
+            i++;
+        }
+    }
+    return count;
+}
 
 void dibujar(QTextStream& out, uint32* tablero, sint32 alto, sint32 ancho,
              sint32 tipo, sint32 rot, sint32 x, sint32 y)
@@ -113,5 +118,3 @@ void dibujar(QTextStream& out, uint32* tablero, sint32 alto, sint32 ancho,
         out << "|\n";
     }
 }
-
-

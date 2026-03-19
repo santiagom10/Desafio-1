@@ -9,7 +9,9 @@ int main(int argc, char* argv[])
     QTextStream in(stdin);
     QTextStream out(stdout);
 
-
+    out << "+==============================+\n";
+    out << "|        T E T R I S           |\n";
+    out << "+==============================+\n\n";
     out.flush();
 
     ejecutarJuego(in, out);
