@@ -1,12 +1,25 @@
 #include "tablero.h"
 
 const uint8 PIEZAS[7][4][4] = {
-    {{0x0,0xF,0,0},{2,2,2,2},{0x0,0xF,0,0},{2,2,2,2}},
-    {{6,6,0,0},{6,6,0,0},{6,6,0,0},{6,6,0,0}},
-    {{4,0xE,0,0},{4,6,4,0},{0xE,4,0,0},{4,0xC,4,0}},
+    // I
+    {{0xF,0,0,0},{8,8,8,8},{0xF,0,0,0},{8,8,8,8}},
+
+    // O
+    {{0xC,0xC,0,0},{0xC,0xC,0,0},{0xC,0xC,0,0},{0xC,0xC,0,0}},
+
+    // T
+    {{0xE,4,0,0},{4,0xC,4,0},{4,0xE,0,0},{4,6,4,0}},
+
+    // S
     {{6,0xC,0,0},{4,6,2,0},{6,0xC,0,0},{4,6,2,0}},
+
+    // Z
     {{0xC,6,0,0},{2,6,4,0},{0xC,6,0,0},{2,6,4,0}},
+
+    // J
     {{8,0xE,0,0},{6,4,4,0},{0xE,2,0,0},{4,4,0xC,0}},
+
+    // L
     {{2,0xE,0,0},{4,4,6,0},{0xE,8,0,0},{0xC,4,4,0}}
 };
 
@@ -30,17 +43,34 @@ uint32 mascaraLlena(sint32 ancho)
 uint32 mascaraPieza(uint8 fila, sint32 x)
 {
     uint32 m = fila << 28;
-    return m >> x;
+
+    if (x >= 0)
+        return m >> x;
+    else
+        return m << (-x);
 }
+sint32 offsetIzq(const uint8 pieza[4])
+{
+    for (int col = 0; col < 4; col++) {
+        for (int fila = 0; fila < 4; fila++) {
+            if ((pieza[fila] >> (3 - col)) & 1)
+                return col;
+        }
+    }
+    return 0;
+}
+
 
 bool hayColision(uint32* tablero, sint32 alto, sint32 ancho,
                  sint32 tipo, sint32 rot, sint32 x, sint32 y)
 {
-    // 🔥 CONTROL DE BORDES (SOLUCIÓN)
     if (x < 0)
         return true;
+
     uint32 llena = mascaraLlena(ancho);
     uint32 fuera = ~llena;
+
+    int offset = offsetIzq(PIEZAS[tipo][rot]);
 
     for (int f = 0; f < 4; f++) {
         uint8 fila = PIEZAS[tipo][rot][f];
@@ -51,11 +81,13 @@ bool hayColision(uint32* tablero, sint32 alto, sint32 ancho,
         if (real >= alto)
             return true;
 
-        uint32 m = mascaraPieza(fila, x);
+        uint32 m = mascaraPieza(fila, x - offset);
 
+        // borde derecho
         if (m & fuera)
             return true;
 
+        // colisión con tablero
         if (real >= 0 && (m & tablero[real]))
             return true;
     }
@@ -66,13 +98,17 @@ bool hayColision(uint32* tablero, sint32 alto, sint32 ancho,
 void fijarPieza(uint32* tablero, sint32 alto,
                 sint32 tipo, sint32 rot, sint32 x, sint32 y)
 {
+    int offset = offsetIzq(PIEZAS[tipo][rot]);
+
     for (int f = 0; f < 4; f++) {
         uint8 fila = PIEZAS[tipo][rot][f];
         if (!fila) continue;
 
         int real = y + f;
-        if (real >= 0 && real < alto)
-            tablero[real] |= mascaraPieza(fila, x);
+
+        if (real >= 0 && real < alto) {
+            tablero[real] |= mascaraPieza(fila, x - offset);
+        }
     }
 }
 
@@ -94,6 +130,7 @@ sint32 limpiarFilas(uint32* tablero, sint32 alto, sint32 ancho)
     return count;
 }
 
+
 void dibujar(QTextStream& out, uint32* tablero, sint32 alto, sint32 ancho,
              sint32 tipo, sint32 rot, sint32 x, sint32 y)
 {
@@ -107,7 +144,8 @@ void dibujar(QTextStream& out, uint32* tablero, sint32 alto, sint32 ancho,
 
             bool pieza = false;
             int pf = i - y;
-            int pc = j - x;
+            int offset = offsetIzq(PIEZAS[tipo][rot]);
+            int pc = j - (x - offset);
 
             if (pf >= 0 && pf < 4 && pc >= 0 && pc < 4) {
                 pieza = (PIEZAS[tipo][rot][pf] >> (3 - pc)) & 1;
