@@ -3,6 +3,9 @@
 #include <cstdlib>
 #include <ctime>
 #include <QString>
+
+typedef int sint32;
+
 sint32 leerEntero(QTextStream& in, QTextStream& out, const char* msg)
 {
     sint32 v;
@@ -77,18 +80,6 @@ void ejecutarJuego(QTextStream& in, QTextStream& out)
         else if (op == 'd') {
             if (!hayColision(tablero, alto, ancho, tipo, rot, x + 1, y)) x++;
         }
-        else if (op == 's') {
-            if (!hayColision(tablero, alto, ancho, tipo, rot, x, y + 1)) {
-                y++;
-            } else {
-                fijarPieza(tablero, alto, tipo, rot, x, y);
-                limpiarFilas(tablero, alto, ancho);
-                nuevaPieza(ancho, tipo, rot, x, y);
-
-                if (hayColision(tablero, alto, ancho, tipo, rot, x, y))
-                    corriendo = false;
-            }
-        }
         else if (op == 'w') {
             sint32 nuevaRot = (rot + 1) & 3;
             if (!hayColision(tablero, alto, ancho, tipo, nuevaRot, x, y))
@@ -96,6 +87,24 @@ void ejecutarJuego(QTextStream& in, QTextStream& out)
         }
         else if (op == 'q') {
             break;
+        }
+
+        if (op == 's') {
+            if (!hayColision(tablero, alto, ancho, tipo, rot, x, y + 1)) {
+                y++;
+                continue;
+            }
+        }
+
+        if (!hayColision(tablero, alto, ancho, tipo, rot, x, y + 1)) {
+            y++;
+        } else {
+            fijarPieza(tablero, alto, tipo, rot, x, y);
+            limpiarFilas(tablero, alto, ancho);
+            nuevaPieza(ancho, tipo, rot, x, y);
+
+            if (hayColision(tablero, alto, ancho, tipo, rot, x, y))
+                corriendo = false;
         }
     }
 
