@@ -9,7 +9,18 @@ const uint8 PIEZAS[7][4][4] = {
     {{8,0xE,0,0},{6,4,4,0},{0xE,2,0,0},{4,4,0xC,0}},
     {{2,0xE,0,0},{4,4,6,0},{0xE,8,0,0},{0xC,4,4,0}}
 };
-
+const char* colorPieza(int tipo) {
+    switch (tipo) {
+    case 0: return "\033[36m"; // I - cyan
+    case 1: return "\033[33m"; // O - amarillo
+    case 2: return "\033[35m"; // T - magenta
+    case 3: return "\033[32m"; // S - verde
+    case 4: return "\033[31m"; // Z - rojo
+    case 5: return "\033[34m"; // J - azul
+    case 6: return "\033[37m"; // L - blanco
+    default: return "\033[0m";
+    }
+}
 uint32* crearTablero(sint32 alto)
 {
     uint32* t = new uint32[alto];
@@ -125,12 +136,20 @@ void dibujar(QTextStream& out, uint32* tablero, sint32 alto, sint32 ancho,
             if (pf >= 0 && pf < 4 && pc >= 0 && pc < 4)
                 pieza = (PIEZAS[tipo][rot][pf] >> (3 - pc)) & 1;
 
-            out << ((ocupado || pieza) ? "#" : ".");
+            if (ocupado) {
+                out << "\033[37m#\033[0m";
+            }
+            else if (pieza) {
+                out << colorPieza(tipo) << "#" << "\033[0m";
+            }
+            else {
+                out << ".";
+            }
         }
         out << "|\n";
     }
 
-    // 🔻 PISO
+
     out << "+";
     for (int j = 0; j < ancho; j++) out << "-";
     out << "+\n";
