@@ -30,13 +30,11 @@ char leerChar(QTextStream& in, QTextStream& out)
     out << "Accion: [A]Izq [D]Der [S]Bajar [W]Rotar [Q]Salir: ";
     out.flush();
 
-    QString linea = in.readLine();
-    if (linea.isEmpty()) return ' ';
-
-    char op = linea[0].toLatin1();
+    char op;
+    in >> op;
 
     if (op >= 'A' && op <= 'Z')
-        op = (char)(op + ('a' - 'A'));
+        op = op + ('a' - 'A');
 
     return op;
 }
