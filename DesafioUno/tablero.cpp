@@ -117,7 +117,6 @@ void dibujar(QTextStream& out, uint32* tablero, sint32 alto, sint32 ancho,
 {
     out << "\n";
 
-    // 🔝 TECHO
     out << "+";
     for (int j = 0; j < ancho; j++) out << "-";
     out << "+\n";
